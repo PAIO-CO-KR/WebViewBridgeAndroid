@@ -1,0 +1,8 @@
+
+WebViewBridge/bin/*
+WebViewBridge/gen/*
+WebViewBridge/.settings/*
+
+WebViewBridgeTest/bin/*
+WebViewBridgeTest/gen/*
+WebViewBridgeTest/.settings/*

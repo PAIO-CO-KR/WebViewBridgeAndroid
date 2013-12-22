@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="kr.co.b612lodger.webViewBridge"
+    android:versionCode="1"
+    android:versionName="0.2" >
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19" />
+
+    <application
+        android:allowBackup="true">
+    </application>
+
+</manifest>
