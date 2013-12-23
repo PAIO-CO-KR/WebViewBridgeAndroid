@@ -44,9 +44,10 @@ public class WebviewBridge implements OnResponseListener {
 	 */
 	private Object getJavascriptInterface() {
 		return new Object() {
-			@SuppressWarnings("unused")
+			
 			@JavascriptInterface
 			public void request(String request) {
+				Log.v(TAG, "Request : [" + request + "]");
 				mServerStub.execute(request);
 			}
 		};
@@ -54,6 +55,7 @@ public class WebviewBridge implements OnResponseListener {
 	
 	@Override
 	public void onResponse(String response) {
+		Log.v(TAG, "Response : [" + response + "]");
 		mWebView.loadUrl("javascript:onResponse(" + response + ")");
 	}
 	

@@ -1,0 +1,10 @@
+<input type="button" value="Say hello" onClick="showAndroidToast('Hello Android!')" />
+<input type="button" value="Say hello2" />
+
+<script type="text/javascript">
+    function showAndroidToast(toast) {
+        var p = {"jsonrpc": "2.0", "method": "subtract", "params": {"minuend": 42, "subtrahend": 23}, "id": 1};
+        
+    	jsonRpc.request(JSON.stringify(p));
+    }
+</script>
