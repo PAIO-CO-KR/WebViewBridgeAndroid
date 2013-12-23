@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="kr.co.b612lodger.webViewBridge" />
+        android:targetPackage="kr.co.b612lodger.webViewBridge.test" />
 
     <application
         android:icon="@drawable/ic_launcher"

@@ -1,4 +1,8 @@
 package kr.co.b612lodger.webViewBridge.test;
+import com.googlecode.openbeans.BeanInfo;
+import com.googlecode.openbeans.Introspector;
+import com.googlecode.openbeans.PropertyDescriptor;
+
 import junit.framework.TestCase;
 import kr.co.b612lodger.jsonRpc.AsyncServerStub;
 import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
@@ -81,6 +85,36 @@ public class SimpleTest extends TestCase {
 		});;
 		serverStub.executeAsync(singleRequest);
 	}
+	
+	
+	@MediumTest  
+	public void beanTest() throws Exception {  
+		ServerStub serverStub = new ServerStub();
+		serverStub.registMethod("subtract", new MethodHandler<TestParam, Integer>() {
+			
+			@Override
+			public Integer execute(TestParam requestParam) {
+				assertNotNull(requestParam);
+				return requestParam.getSubtrahend() - requestParam.getMinuend();
+			}
+		});
+		Class<?> cls = serverStub.findAvailableParamClass("subtract");
+	    final BeanInfo beanInfo = Introspector.getBeanInfo(cls);  
+	    final PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();  
+	          
+	    for (final PropertyDescriptor propertyDescriptor : propertyDescriptors) {  
+	    	if(propertyDescriptor.getName().equals("minuend")) {
+	    		assertEquals(Integer.class, propertyDescriptor.getPropertyType());  
+	            assertNotNull(propertyDescriptor.getReadMethod());  
+	            assertNotNull(propertyDescriptor.getWriteMethod());
+	    	}
+	    	if(propertyDescriptor.getName().equals("subtrahend")) {
+	    		assertEquals(Integer.class, propertyDescriptor.getPropertyType());  
+	            assertNotNull(propertyDescriptor.getReadMethod());  
+	            assertNotNull(propertyDescriptor.getWriteMethod());
+	    	}
+	    }  
+	} 
 	
 	
 	
