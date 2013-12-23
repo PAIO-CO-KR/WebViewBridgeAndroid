@@ -29,6 +29,7 @@ public class WebviewBridge implements OnResponseListener {
 		
 		mWebView = webview;
 		mServerStub = serverStub;
+		mServerStub.setOnResponseListener(this);
 		
 		WebSettings webSettings = webview.getSettings();
 		webSettings.setJavaScriptEnabled(true);
