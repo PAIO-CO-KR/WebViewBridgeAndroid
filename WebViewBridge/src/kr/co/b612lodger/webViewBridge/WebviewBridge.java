@@ -1,6 +1,7 @@
 package kr.co.b612lodger.webViewBridge;
 
-import kr.co.b612lodger.jsonRpc.ServerStub;
+import kr.co.b612lodger.jsonRpc.AsyncServerStub;
+import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -8,15 +9,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 @SuppressLint("SetJavaScriptEnabled")
-public class WebviewBridge {
+public class WebviewBridge implements OnResponseListener {
 	
 	private static final String TAG = WebviewBridge.class.getName();
 	
 	private WebView mWebView;
 	
-	private ServerStub mServerStub;
+	private AsyncServerStub mServerStub;
 	
-	public WebviewBridge(WebView webview, ServerStub serverStub) {
+	public WebviewBridge(WebView webview, AsyncServerStub serverStub) {
 		if(webview == null) {
 			Log.e(TAG, "webview can not be null");
 			return;
@@ -50,4 +51,11 @@ public class WebviewBridge {
 			}
 		};
 	}
+	
+	@Override
+	public void onResponse(String response) {
+		mWebView.loadUrl("javascript:onResponse(" + response + ")");
+	}
+	
+	
 }
