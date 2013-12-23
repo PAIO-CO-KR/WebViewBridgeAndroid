@@ -2,7 +2,6 @@ package kr.co.b612lodger.webViewBridge;
 
 import kr.co.b612lodger.jsonRpc.ServerStub;
 import android.annotation.SuppressLint;
-import android.os.HandlerThread;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -34,8 +33,6 @@ public class WebviewBridge {
 		webSettings.setJavaScriptEnabled(true);
 		
 		mWebView.addJavascriptInterface(getJavascriptInterface(), "jsonRpc");
-		
-		new HandlerThread("dd").getLooper(); 
 	}
 	
 	
@@ -46,6 +43,7 @@ public class WebviewBridge {
 	 */
 	private Object getJavascriptInterface() {
 		return new Object() {
+			@SuppressWarnings("unused")
 			@JavascriptInterface
 			public void request(String request) {
 				mServerStub.execute(request);
