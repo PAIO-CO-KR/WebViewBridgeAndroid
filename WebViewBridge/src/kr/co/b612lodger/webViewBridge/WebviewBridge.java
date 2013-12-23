@@ -5,6 +5,7 @@ import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -28,6 +29,8 @@ public class WebviewBridge implements OnResponseListener {
 		}
 		
 		mWebView = webview;
+		//TODO debug code. remove this.
+		mWebView.setWebChromeClient(new WebChromeClient());
 		mServerStub = serverStub;
 		mServerStub.setOnResponseListener(this);
 		
@@ -49,7 +52,7 @@ public class WebviewBridge implements OnResponseListener {
 			@JavascriptInterface
 			public void request(String request) {
 				Log.v(TAG, "Request : [" + request + "]");
-				mServerStub.execute(request);
+				mServerStub.executeAsync(request);
 			}
 		};
 	}
@@ -57,7 +60,7 @@ public class WebviewBridge implements OnResponseListener {
 	@Override
 	public void onResponse(String response) {
 		Log.v(TAG, "Response : [" + response + "]");
-		mWebView.loadUrl("javascript:onResponse(" + response + ")");
+		mWebView.loadUrl("javascript:alert(" + response + ")");
 	}
 	
 	
