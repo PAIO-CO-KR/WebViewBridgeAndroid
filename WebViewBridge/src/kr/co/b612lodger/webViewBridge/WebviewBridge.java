@@ -2,6 +2,7 @@ package kr.co.b612lodger.webViewBridge;
 
 import kr.co.b612lodger.jsonRpc.AsyncServerStub;
 import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
+import kr.co.b612lodger.jsonRpc.core.MethodHandler;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -18,26 +19,29 @@ public class WebviewBridge implements OnResponseListener {
 	
 	private AsyncServerStub mServerStub;
 	
-	public WebviewBridge(WebView webview, AsyncServerStub serverStub) {
+	public WebviewBridge(WebView webview) {
 		if(webview == null) {
 			Log.e(TAG, "webview can not be null");
-			return;
-		}
-		if(serverStub == null) {
-			Log.e(TAG, "serverStub can not be null");
 			return;
 		}
 		
 		mWebView = webview;
 		//TODO debug code. remove this.
 		mWebView.setWebChromeClient(new WebChromeClient());
-		mServerStub = serverStub;
+		mServerStub = new AsyncServerStub();
 		mServerStub.setOnResponseListener(this);
 		
 		WebSettings webSettings = webview.getSettings();
 		webSettings.setJavaScriptEnabled(true);
 		
 		mWebView.addJavascriptInterface(getJavascriptInterface(), "jsonRpc");
+	}
+	
+	
+	public void registMethod(String methodName, MethodHandler<?, ?> method) {
+		if(mServerStub != null) {
+			mServerStub.registMethod(methodName, method);
+		}
 	}
 	
 	
@@ -60,7 +64,7 @@ public class WebviewBridge implements OnResponseListener {
 	@Override
 	public void onResponse(String response) {
 		Log.v(TAG, "Response : [" + response + "]");
-		mWebView.loadUrl("javascript:alert(" + response + ")");
+		mWebView.loadUrl("javascript:onRpcResponse(" + response + ")");
 	}
 	
 	

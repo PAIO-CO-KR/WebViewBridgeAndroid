@@ -29,8 +29,8 @@ public class WebviewTestActivity extends Activity {
 	private void initServerStub() {
 		
 		mWebView = (WebView) findViewById(R.id.webview);
-		mServerStub = new AsyncServerStub();
-		mServerStub.registMethod("subtract", new MethodHandler<TestParam, Integer>() {
+		mWebviewBridge = new WebviewBridge(mWebView);
+		mWebviewBridge.registMethod("subtract", new MethodHandler<TestParam, Integer>() {
 			
 			@Override
 			public Integer execute(TestParam requestParam) {
@@ -38,8 +38,6 @@ public class WebviewTestActivity extends Activity {
 				return requestParam.getSubtrahend() - requestParam.getMinuend();
 			}
 		});
-		
-		mWebviewBridge = new WebviewBridge(mWebView, mServerStub);
 		
 		mWebView.loadUrl("file:///android_asset/www/index.html");
 	}
