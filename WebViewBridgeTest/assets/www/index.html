@@ -1,5 +1,7 @@
 <input type="button" value="do some math" onClick="test();" />
 
+<script src="./rpcStubMock.js"></script>
+
 <script>
 function test() {
 	rpcStub.request('subtract', {minuend: 42, subtrahend: 23}, function(result){

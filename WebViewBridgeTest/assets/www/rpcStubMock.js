@@ -4,13 +4,6 @@
  */
 var rpcStub = (function(){
 	var request = function(method, params, callback) {
-		var rpcObj = {
-			jsonrpc: '2.0',
-			method: method,
-			params: params,
-			id: randomId()
-		};
-		
 		callback(null);
 	};
 	
