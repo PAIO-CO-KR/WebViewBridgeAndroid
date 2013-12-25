@@ -25,7 +25,21 @@ public class WebviewBridge implements OnResponseListener {
 	
 	private AsyncServerStub mServerStub;
 	
-	public WebviewBridge(WebView webview) {
+	
+	/**
+	 * Constructor
+	 */
+	public WebviewBridge() {
+		mServerStub = new AsyncServerStub();
+		mServerStub.setOnResponseListener(this);
+	}
+	
+	
+	/**
+	 * Bind Webview
+	 * @param webview
+	 */
+	public void bindWebView(WebView webview) {
 		if(webview == null) {
 			Log.e(TAG, "webview can not be null");
 			return;
@@ -54,16 +68,19 @@ public class WebviewBridge implements OnResponseListener {
 				mWebView.loadUrl("javascript:" + webviewJsCode);
 		    }
 		});
-		mServerStub = new AsyncServerStub();
-		mServerStub.setOnResponseListener(this);
 		
-		WebSettings webSettings = webview.getSettings();
+		WebSettings webSettings = mWebView.getSettings();
 		webSettings.setJavaScriptEnabled(true);
 		
 		mWebView.addJavascriptInterface(getJavascriptInterface(), "jsonRpc");
 	}
 	
 	
+	/**
+	 * Register Method.
+	 * @param methodName
+	 * @param method
+	 */
 	public void registMethod(String methodName, MethodHandler<?, ?> method) {
 		if(mServerStub != null) {
 			mServerStub.registMethod(methodName, method);
@@ -87,10 +104,13 @@ public class WebviewBridge implements OnResponseListener {
 		};
 	}
 	
+	
 	@Override
 	public void onResponse(String response) {
 		Log.v(TAG, "Response : [" + response + "]");
-		mWebView.loadUrl("javascript:rpcStub.response(" + response + ")");
+		if(mWebView != null) {
+			mWebView.loadUrl("javascript:rpcStub.response(" + response + ")");
+		}
 	}
 	
 	

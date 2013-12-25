@@ -29,7 +29,8 @@ public class WebviewTestActivity extends Activity {
 	private void initServerStub() {
 		
 		mWebView = (WebView) findViewById(R.id.webview);
-		mWebviewBridge = new WebviewBridge(mWebView);
+		mWebviewBridge = new WebviewBridge();
+		mWebviewBridge.bindWebView(mWebView);
 		mWebviewBridge.registMethod("subtract", new MethodHandler<TestParam, Integer>() {
 			
 			@Override
