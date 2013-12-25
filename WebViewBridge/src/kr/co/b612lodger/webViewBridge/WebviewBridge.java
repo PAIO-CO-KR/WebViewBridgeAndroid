@@ -5,15 +5,21 @@ import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
 import kr.co.b612lodger.jsonRpc.core.MethodHandler;
 import android.annotation.SuppressLint;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class WebviewBridge implements OnResponseListener {
 	
 	private static final String TAG = WebviewBridge.class.getName();
+	
+	private static final String JSTAG = WebviewBridge.class.getName() + "_JS";
+	
+	private static final String webviewJsCode = "var rpcStub=function(){var d=window.jsonRpc,e=void 0!==d,b={};return{request:function(a,f,c){for(a={jsonrpc:\"2.0\",method:a,params:f,id:Math.floor(1E6*Math.random())+1};void 0!==b[a.id];)a.id=Math.floor(1E6*Math.random())+1;b[a.id]=c;c=JSON.stringify(a);console.log(c);e?d.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)a=responseObj,b[a.id](a.result),b[a.id]=void 0;else b[a.id](a.result),b[a.id]=void 0}}}();";
 	
 	private WebView mWebView;
 	
@@ -27,7 +33,27 @@ public class WebviewBridge implements OnResponseListener {
 		
 		mWebView = webview;
 		//TODO debug code. remove this.
-		mWebView.setWebChromeClient(new WebChromeClient());
+		mWebView.setWebChromeClient(new WebChromeClient() {
+			public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+				Log.d(JSTAG, message + " -- From line "
+                        + lineNumber + " of "
+                        + sourceID);
+			}
+			
+			public boolean onConsoleMessage(ConsoleMessage cm) {
+				Log.d(JSTAG, cm.message() + " -- From line "
+						+ cm.lineNumber() + " of "
+						+ cm.sourceId() );
+				return true;
+			}
+		});
+		mWebView.setWebViewClient(new WebViewClient(){
+			
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				mWebView.loadUrl("javascript:" + webviewJsCode);
+		    }
+		});
 		mServerStub = new AsyncServerStub();
 		mServerStub.setOnResponseListener(this);
 		
@@ -64,7 +90,7 @@ public class WebviewBridge implements OnResponseListener {
 	@Override
 	public void onResponse(String response) {
 		Log.v(TAG, "Response : [" + response + "]");
-		mWebView.loadUrl("javascript:onRpcResponse(" + response + ")");
+		mWebView.loadUrl("javascript:rpcStub.response(" + response + ")");
 	}
 	
 	

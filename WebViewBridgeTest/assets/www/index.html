@@ -1,67 +1,9 @@
-<input type="button" value="Say hello" onClick="showAndroidToast('Hello Android!')" />
-<input type="button" value="Say hello2" />
+<input type="button" value="do some math" onClick="test();" />
 
-<script type="text/javascript">
-var rpcStub = (function(){
-	var androidRpcBridge = window.jsonRpc;
-	var isAndroid = androidRpcBridge !== undefined;
-
-	var callbackMap = {};
-
-	/**
-	* Request
-	*/
-	var request = function(method, params, callback) {
-		var rpcObj = {
-			jsonrpc: '2.0',
-			method: method,
-			params: params,
-			id: randomId()
-		};
-
-		//add callback to empty slot
-		while(callbackMap[rpcObj.id] !== undefined) {
-			rpcObj.id = randomId();
-		}
-		callbackMap[rpcObj.id] = callback;
-
-		//build json string.
-		var rpcString = JSON.stringify(rpcObj);
-		
-		//android or ios
-		if(isAndroid) {
-			androidRpcBridge.request(rpcString);
-		} else {
-			document.location.href = 'jsonrpc://' + rpcString;
-		}
-	};
-
-	/**
-	* Response
-	*/
-	var response = function(responseString) {
-		var responseObjs = JSON.parse(responseString);
-		if(responseObjs instanceof Array) {
-			for(responseObj in responseObjs) {
-				handleSingleResponse(responseObj);
-			}
-		} else {
-			handleSingleResponse(responseObjs);
-		}
-	}
-
-	function handleSingleResponse(responseObj) {
-		callbackMap[responseObj.id]();
-	}
-
-	function randomId() {
-		return Math.floor(Math.random() * 1000000000) + 1;
-	}
-
-	return {
-		request: request,
-		response: response
-	};
-}());
-
+<script>
+function test() {
+	rpcStub.request('subtract', {minuend: 42, subtrahend: 23}, function(result){
+		alert('subtract result : ' + result);
+	});
+}
 </script>
