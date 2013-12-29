@@ -9,11 +9,16 @@ var rpcStub = (function(){
 	var isAndroid = androidRpcBridge !== undefined;
 
 	var callbackMap = {};
+	var contextMap = {};
+	
+	var putTestResponse = function(method, result) {
+		return;
+	}
 
 	/**
 	* Request
 	*/
-	var request = function(method, params, callback) {
+	var request = function(method, params, callback, context) {
 		var rpcObj = {
 			jsonrpc: '2.0',
 			method: method,
@@ -26,6 +31,7 @@ var rpcStub = (function(){
 			rpcObj.id = randomId();
 		}
 		callbackMap[rpcObj.id] = callback;
+		contextMap[rpcObj.id] = context;
 
 		//build json string.
 		var rpcString = JSON.stringify(rpcObj);
@@ -56,8 +62,9 @@ var rpcStub = (function(){
 	}
 
 	function handleSingleResponse(responseObj) {
-		callbackMap[responseObj.id](responseObj.result);
+		callbackMap[responseObj.id].call(contextMap[responseObj.id], responseObj.result);
 		callbackMap[responseObj.id] = undefined;
+		contextMap[responseObj.id] = undefined;
 	}
 
 	function log(message) {
@@ -72,6 +79,7 @@ var rpcStub = (function(){
 
 	return {
 		request: request,
-		response: response
+		response: response,
+		putTestResponse: putTestResponse
 	};
 }());

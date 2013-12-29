@@ -19,7 +19,7 @@ public class WebviewBridge implements OnResponseListener {
 	
 	private static final String JSTAG = WebviewBridge.class.getName() + "_JS";
 	
-	private static final String webviewJsCode = "var rpcStub=function(){var d=window.jsonRpc,e=void 0!==d,b={};return{request:function(a,f,c){for(a={jsonrpc:\"2.0\",method:a,params:f,id:Math.floor(1E6*Math.random())+1};void 0!==b[a.id];)a.id=Math.floor(1E6*Math.random())+1;b[a.id]=c;c=JSON.stringify(a);console.log(c);e?d.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)a=responseObj,b[a.id](a.result),b[a.id]=void 0;else b[a.id](a.result),b[a.id]=void 0}}}();";
+	private static final String webviewJsCode = "var rpcStub=function(){function b(a){d[a.id].call(e[a.id],a.result);d[a.id]=void 0;e[a.id]=void 0}var f=window.jsonRpc,g=void 0!==f,d={},e={};return{request:function(a,b,c,h){for(a={jsonrpc:\"2.0\",method:a,params:b,id:Math.floor(1E6*Math.random())+1};void 0!==d[a.id];)a.id=Math.floor(1E6*Math.random())+1;d[a.id]=c;e[a.id]=h;c=JSON.stringify(a);console.log(c);g?f.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)b(responseObj);else b(a)},putTestResponse:function(a,b){}}}();";
 	
 	private WebView mWebView;
 	
