@@ -4,6 +4,8 @@ import kr.co.b612lodger.jsonRpc.AsyncServerStub;
 import kr.co.b612lodger.jsonRpc.AsyncServerStub.OnResponseListener;
 import kr.co.b612lodger.jsonRpc.core.MethodHandler;
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
@@ -20,11 +22,14 @@ public class WebviewBridge implements OnResponseListener {
 	
 	private static final String JSTAG = WebviewBridge.class.getName() + "_JS";
 	
-	private static final String webviewJsCode = "var rpcStub=function(){function b(a){d[a.id].call(e[a.id],a.result);d[a.id]=void 0;e[a.id]=void 0}var d={},e={};return{request:function(a,b,c,f){for(a={jsonrpc:\"2.0\",method:a,params:b,id:Math.floor(1E6*Math.random())+1};void 0!==d[a.id];)a.id=Math.floor(1E6*Math.random())+1;d[a.id]=c;e[a.id]=f;c=JSON.stringify(a);console.log(c);void 0!==window.jsonRpc?window.jsonRpc.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)b(responseObj);else b(a)},putTestResponse:function(a,b){}}}();";
+	private static final String webviewJsCode = "var rpcStub=function(){function d(a){void 0!==b[a.id]&&null!==b[a.id]&&(b[a.id].call(e[a.id],a.result),b[a.id]=void 0,e[a.id]=void 0)}var b={},e={};return{request:function(a,d,c,f){for(a={jsonrpc:\"2.0\",method:a,params:d,id:Math.floor(1E6*Math.random())+1};void 0!==b[a.id];)a.id=Math.floor(1E6*Math.random())+1;b[a.id]=c;e[a.id]=f;c=JSON.stringify(a);console.log(c);void 0!==window.jsonRpc?window.jsonRpc.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)d(responseObj);else d(a)},putTestResponse:function(a,b){}}}();";
 	
 	private WebView mWebView;
 	
 	private AsyncServerStub mServerStub;
+	
+	//request handler. it is supposed to be in main thread.
+	private Handler mMainHandler;
 	
 	
 	/**
@@ -43,8 +48,15 @@ public class WebviewBridge implements OnResponseListener {
 	public void bindWebView(WebView webview) {
 		if(webview == null) {
 			Log.e(TAG, "webview can not be null");
-			return;
+			throw new RuntimeException("webview can not be null");
 		}
+		
+		if(Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			Log.w(TAG, "bindWebView must me called on main thread.");
+			throw new RuntimeException("bindWebView must me called on main thread.");
+		}
+		mMainHandler = new Handler();
+		
 		
 		mWebView = webview;
 		//TODO debug code. remove this.
@@ -99,9 +111,14 @@ public class WebviewBridge implements OnResponseListener {
 		return new Object() {
 			
 			@JavascriptInterface
-			public void request(String request) {
-				Log.v(TAG, "Request : [" + request + "]");
-				mServerStub.executeAsync(request);
+			public void request(final String request) {
+				mMainHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						Log.v(TAG, "Request : [" + request + "]");
+						mServerStub.executeAsync(request);
+					}
+				});
 			}
 		};
 	}
