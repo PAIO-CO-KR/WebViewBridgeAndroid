@@ -6,6 +6,7 @@ var rpcStub = (function(){
 	var testResult = {};
 	
 	var request = function(method, params, callback, context) {
+		console.log('requested : ' + method + ' : ' + JSON.stringify(params));
 		if(typeof(callback) == 'function') {
 			callback.call(context, testResult[method]);
 		}
