@@ -63,6 +63,9 @@ var rpcStub = (function(){
 	}
 
 	function handleSingleResponse(responseObj) {
+		if(callbackMap[responseObj.id] === undefined || callbackMap[responseObj.id] === null) {
+			return;
+		}
 		callbackMap[responseObj.id].call(contextMap[responseObj.id], responseObj.result);
 		callbackMap[responseObj.id] = undefined;
 		contextMap[responseObj.id] = undefined;
