@@ -5,9 +5,6 @@
  */
 var rpcStub = (function(){
 	var debugEnabled = true;
-	var androidRpcBridge = window.jsonRpc;
-	var isAndroid = androidRpcBridge !== undefined;
-
 	var callbackMap = {};
 	var contextMap = {};
 	
@@ -38,8 +35,8 @@ var rpcStub = (function(){
 		log(rpcString);
 		
 		//android or ios
-		if(isAndroid) {
-			androidRpcBridge.request(rpcString);
+		if(isAndroid()) {
+			window.jsonRpc.request(rpcString);
 		} else {
 			document.location.href = 'jsonrpc://' + rpcString;
 		}
@@ -59,6 +56,10 @@ var rpcStub = (function(){
 		} else {
 			handleSingleResponse(responseObjs);
 		}
+	}
+	
+	function isAndroid() {
+		return window.jsonRpc !== undefined;
 	}
 
 	function handleSingleResponse(responseObj) {

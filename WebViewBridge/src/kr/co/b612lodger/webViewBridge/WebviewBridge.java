@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.graphics.Bitmap;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class WebviewBridge implements OnResponseListener {
@@ -19,7 +20,7 @@ public class WebviewBridge implements OnResponseListener {
 	
 	private static final String JSTAG = WebviewBridge.class.getName() + "_JS";
 	
-	private static final String webviewJsCode = "var rpcStub=function(){function b(a){d[a.id].call(e[a.id],a.result);d[a.id]=void 0;e[a.id]=void 0}var f=window.jsonRpc,g=void 0!==f,d={},e={};return{request:function(a,b,c,h){for(a={jsonrpc:\"2.0\",method:a,params:b,id:Math.floor(1E6*Math.random())+1};void 0!==d[a.id];)a.id=Math.floor(1E6*Math.random())+1;d[a.id]=c;e[a.id]=h;c=JSON.stringify(a);console.log(c);g?f.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)b(responseObj);else b(a)},putTestResponse:function(a,b){}}}();";
+	private static final String webviewJsCode = "var rpcStub=function(){function b(a){d[a.id].call(e[a.id],a.result);d[a.id]=void 0;e[a.id]=void 0}var d={},e={};return{request:function(a,b,c,f){for(a={jsonrpc:\"2.0\",method:a,params:b,id:Math.floor(1E6*Math.random())+1};void 0!==d[a.id];)a.id=Math.floor(1E6*Math.random())+1;d[a.id]=c;e[a.id]=f;c=JSON.stringify(a);console.log(c);void 0!==window.jsonRpc?window.jsonRpc.request(c):document.location.href=\"jsonrpc://\"+c},response:function(a){a=\"string\"==typeof a||a instanceof String?JSON.parse(a):a;if(a instanceof Array)for(responseObj in a)b(responseObj);else b(a)},putTestResponse:function(a,b){}}}();";
 	
 	private WebView mWebView;
 	
@@ -64,9 +65,10 @@ public class WebviewBridge implements OnResponseListener {
 		mWebView.setWebViewClient(new WebViewClient(){
 			
 			@Override
-			public void onPageFinished(WebView view, String url) {
+			public void onPageStarted(WebView view, String url, Bitmap favicon) {
+				Log.v(TAG, "pushing js code");
 				mWebView.loadUrl("javascript:" + webviewJsCode);
-		    }
+			}
 		});
 		
 		WebSettings webSettings = mWebView.getSettings();
